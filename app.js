@@ -4,158 +4,158 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 const subjects3ESO = {
     'MATERIAS COMUNES': {
-        'Geografía e Historia': { hours: 3, brit: true, nobit: true },
-        'Lengua Castellana': { hours: 4, brit: true, nobit: true },
-        'Matemáticas': { hours: 3, brit: true, nobit: true },
-        'Física y Química': { hours: 2, brit: true, nobit: true },
-        'Biología y Geología': { hours: 2, brit: true, nobit: true },
-        'Educación Física': { hours: 2, brit: true, nobit: true, div: true },
-        'Educación Valores Cívicos y Éticos': { hours: 1, brit: true, nobit: true, div: true },
-        'Tutoría': { hours: 1, brit: true, nobit: true, div: true }
+        'Geografía e Historia': { hours: 3, brit: true, nobit: true, id: '3mcgh' },
+        'Lengua Castellana': { hours: 4, brit: true, nobit: true, id: '3mclc' },
+        'Matemáticas': { hours: 3, brit: true, nobit: true, id: '3mcm' },
+        'Física y Química': { hours: 2, brit: true, nobit: true, id: '3mcfq' },
+        'Biología y Geología': { hours: 2, brit: true, nobit: true, id: '3mcbg' },
+        'Educación Física': { hours: 2, brit: true, nobit: true, div: true, id: '3mcef' },
+        'Educación Valores Cívicos y Éticos': { hours: 1, brit: true, nobit: true, div: true, id: '3mcevce' },
+        'Tutoría': { hours: 1, brit: true, nobit: true, div: true, id: '3mct' }
     },
     'MATERIAS ESPECÍFICAS': {
-        'Inglés': { hours: 3, brit: 'Brit', nobit: 'No Brit' },
-        'Tecnología': { hours: 3, brit: 'Inglés', nobit: true },
-        'Música': { hours: 3, brit: 'Inglés', nobit: true, div: true }
+        'Inglés': { hours: 3, brit: 'Brit', nobit: 'No Brit', id: '3mei' },
+        'Tecnología': { hours: 3, brit: 'Inglés', nobit: true, id: '3met' },
+        'Música': { hours: 3, brit: 'Inglés', nobit: true, div: true, id: '3mem' }
     },
     'ÁMBITOS': {
-        'Ámbito lingüístico y social': { hours: 10, div: true },
-        'Ámbito científico-tecnológico': { hours: 7, div: true },
-        'Ámbito práctico': { hours: 3, div: true }
+        'Ámbito lingüístico y social': { hours: 10, div: true, id: '3aals' },
+        'Ámbito científico-tecnológico': { hours: 7, div: true, id: '3aact' },
+        'Ámbito práctico': { hours: 3, div: true, id: '3aap' }
     },
     'OPTATIVAS': {
-        'Religión Cristiana/Evangélica/Islámica/Atención Educativa': { hours: 1, brit: 'Elegir 1', nobit: 'Elegir 1', div: 'Elegir 1' },
-        'Francés/Alemán': { hours: 2, brit: 'Elegir 1', nobit: 'Elegir 1' },
-        'Economía Social/Iniciación Filosofía/Programación y Robótica/Cultura Clásica': { hours: 2, nobit: 'Elegir 1' }
+        'Religión Cristiana/Evangélica/Islámica/Atención Educativa': { hours: 1, brit: 'Elegir 1', nobit: 'Elegir 1', div: 'Elegir 1', id: '3orcei' },
+        'Francés/Alemán': { hours: 2, brit: 'Elegir 1', nobit: 'Elegir 1', id: '3ofa' },
+        'Economía Social/Iniciación Filosofía/Programación y Robótica/Cultura Clásica': { hours: 2, nobit: 'Elegir 1', id: '3oeifpcc' }
     }
 };
 
 const subjects4ESO = {
     'TRONCALES OBLIGATORIAS': {
-        'Geografía e Historia': { hours: 3, common: true },
-        'Lengua Castellana y Literatura': { hours: 4, common: true },
-        'Inglés Brit/No Brit': { hours: 4, common: true },
+        'Geografía e Historia': { hours: 3, common: true, id: '4togh' },
+        'Lengua Castellana y Literatura': { hours: 4, common: true, id: '4tolcl' },
+        'Inglés Brit/No Brit': { hours: 4, common: true, id: '4toi' },
         'Matemáticas': { 
-            'Matemáticas B': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico', 'Humanidades y Ciencias Sociales'] },
-            'Matemáticas A': { hours: 4, paths: ['Formación Profesional'] }
+            'Matemáticas B': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico', 'Humanidades y Ciencias Sociales'], id: '4tomb' },
+            'Matemáticas A': { hours: 4, paths: ['Formación Profesional'], id: '4toma' }
         },
-        'Educación Física': { hours: 2, common: true },
-        'Tutoría': { hours: 1, common: true }
+        'Educación Física': { hours: 2, common: true, id: '4toef' },
+        'Tutoría': { hours: 1, common: true, id: '4tot' }
     },
     'TRONCAL DE MODALIDAD 1': {
-        'Física y Química': { hours: 3, paths: ['Ciencias de la Salud', 'Tecnológico'] },
-        'Economía y Empresa': { hours: 3, paths: ['Humanidades y Ciencias Sociales'] },
-        'Formación y Orientación Profesional': { hours: 3, paths: ['Formación Profesional', 'Diversificación Curricular'] }
+        'Física y Química': { hours: 3, paths: ['Ciencias de la Salud', 'Tecnológico'], id: '4tm1fq' },
+        'Economía y Empresa': { hours: 3, paths: ['Humanidades y Ciencias Sociales'], id: '4tm1ee' },
+        'Formación y Orientación Profesional': { hours: 3, paths: ['Formación Profesional', 'Diversificación Curricular'], id: '4tm1fop' }
     },
     'TRONCAL DE MODALIDAD 2': {
-        'Biología y Geología': { hours: 3, paths: ['Ciencias de la Salud'] },
-        'Tecnología brit/ no brit': { hours: 3, paths: ['Tecnológico', 'Formación Profesional'] },
-        'Latín': { hours: 3, paths: ['Humanidades y Ciencias Sociales'] },
-        'Economía y Empresa': { hours: 3, paths: ['Formación Profesional'] }
+        'Biología y Geología': { hours: 3, paths: ['Ciencias de la Salud'], id: '4tm2bg' },
+        'Tecnología brit/ no brit': { hours: 3, paths: ['Tecnológico', 'Formación Profesional'], id: '4tm2t' },
+        'Latín': { hours: 3, paths: ['Humanidades y Ciencias Sociales'], id: '4tm2l' },
+        'Economía y Empresa': { hours: 3, paths: ['Formación Profesional'], id: '4tm2ee' }
     },
     'TRONCAL DE MODALIDAD 3': {
-        'Cultura Científica': { hours: 2, common: true },
-        'Cultura Clásica': { hours: 2, paths: ['Ciencias de la Salud', 'Tecnológico', 'Humanidades y Ciencias Sociales', 'Formación Profesional'] },
-        'Filosofía': { hours: 2, paths: ['Ciencias de la Salud', 'Tecnológico', 'Humanidades y Ciencias Sociales', 'Formación Profesional'] },
-        'Artes escénicas y danza': { hours: 2, common: true },
-        'Matemáticas Aplicadas a la toma de decisiones': { hours: 2, common: true }
+        'Cultura Científica': { hours: 2, common: true, id: '4tm3cc' },
+        'Cultura Clásica': { hours: 2, paths: ['Ciencias de la Salud', 'Tecnológico', 'Humanidades y Ciencias Sociales', 'Formación Profesional'], id: '4tm3cc' },
+        'Filosofía': { hours: 2, paths: ['Ciencias de la Salud', 'Tecnológico', 'Humanidades y Ciencias Sociales', 'Formación Profesional'], id: '4tm3f' },
+        'Artes escénicas y danza': { hours: 2, common: true, id: '4tm3aed' },
+        'Matemáticas Aplicadas a la toma de decisiones': { hours: 2, common: true, id: '4tm3matd' }
     },
     'OPTATIVAS': {
-        'Francés': { hours: 3, common: true },
-        'Alemán': { hours: 3, common: true },
-        'Música Brit/ no Brit': { hours: 3, common: true },
-        'Digitalización Brit /no Brit': { hours: 3, common: true },
-        'Expresión artística': { hours: 3, common: true },
-        'Tecnología Brit /no Brit': { hours: 3, paths: ['Ciencias de la Salud'] },
-        'Biología': { hours: 3, paths: ['Tecnológico'] }
+        'Francés': { hours: 3, common: true, id: '4of' },
+        'Alemán': { hours: 3, common: true, id: '4oa' },
+        'Música Brit/ no Brit': { hours: 3, common: true, id: '4om' },
+        'Digitalización Brit /no Brit': { hours: 3, common: true, id: '4od' },
+        'Expresión artística': { hours: 3, common: true, id: '4oea' },
+        'Tecnología Brit /no Brit': { hours: 3, paths: ['Ciencias de la Salud'], id: '4ot' },
+        'Biología': { hours: 3, paths: ['Tecnológico'], id: '4ob' }
     }
 };
 
 const subjects1BACH = {
     'TRONCALES OBLIGATORIAS': {
-        'Filosofía': { hours: 3, common: true },
-        'Lengua Castellana y Literatura I': { hours: 3, common: true },
-        'Lengua Extranjera I: Inglés': { hours: 3, common: true },
-        'Educación Física': { hours: 2, common: true },
-        'Tutoría': { hours: 1, common: true }
+        'Filosofía': { hours: 3, common: true, id: '1tof' },
+        'Lengua Castellana y Literatura I': { hours: 3, common: true, id: '1tolcl' },
+        'Lengua Extranjera I: Inglés': { hours: 3, common: true, id: '1tolei' },
+        'Educación Física': { hours: 2, common: true, id: '1toef' },
+        'Tutoría': { hours: 1, common: true, id: '1tot' }
     },
     'TRONCAL DE MODALIDAD 1': {
-        'Física y Química': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico'] },
-        'Economía': { hours: 4, paths: ['Ciencias Sociales'] },
-        'Griego I': { hours: 4, paths: ['Humanidades'] }
+        'Física y Química': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico'], id: '1tm1fq' },
+        'Economía': { hours: 4, paths: ['Ciencias Sociales'], id: '1tm1e' },
+        'Griego I': { hours: 4, paths: ['Humanidades'], id: '1tm1g' }
     },
     'TRONCAL DE MODALIDAD 2': {
-        'Biología y Geología': { hours: 4, paths: ['Ciencias de la Salud'] },
-        'Tecnología': { hours: 4, paths: ['Tecnológico'] },
-        'Historia del mundo contemporáneo': { hours: 4, paths: ['Ciencias Sociales', 'Humanidades'] }
+        'Biología y Geología': { hours: 4, paths: ['Ciencias de la Salud'], id: '1tm2bg' },
+        'Tecnología': { hours: 4, paths: ['Tecnológico'], id: '1tm2t' },
+        'Historia del mundo contemporáneo': { hours: 4, paths: ['Ciencias Sociales', 'Humanidades'], id: '1tm2hmc' }
     },
     'TRONCAL DE MODALIDAD 3': {
-        'Matemáticas I': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico'] },
-        'Matemáticas CC.SS I': { hours: 4, paths: ['Ciencias Sociales'] },
-        'Latín I': { hours: 4, paths: ['Humanidades'] }
+        'Matemáticas I': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico'], id: '1tm3m1' },
+        'Matemáticas CC.SS I': { hours: 4, paths: ['Ciencias Sociales'], id: '1tm3mccs1' },
+        'Latín I': { hours: 4, paths: ['Humanidades'], id: '1tm3l1' }
     },
     'OPTATIVA 1 (elegir 1)': {
-        'Informática I': { hours: 4, paths: ['Tecnológico', 'Humanidades'] },
-        'Anatomía Aplicada': { hours: 4, paths: ['Ciencias de la Salud', 'Humanidades'] },
-        'Segunda Lengua Extranjera: Francés': { hours: 4, paths: ['Ciencias Sociales', 'Humanidades'] },
-        'Segunda Lengua Extranjera: Alemán': { hours: 4, paths: ['Ciencias Sociales', 'Humanidades'] },
-        'Dibujo I': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico'] },
-        'Literatura Universal': { hours: 4, paths: ['Humanidades'] }
+        'Informática I': { hours: 4, paths: ['Tecnológico', 'Humanidades'], id: '1o1i' },
+        'Anatomía Aplicada': { hours: 4, paths: ['Ciencias de la Salud', 'Humanidades'], id: '1o1aa' },
+        'Segunda Lengua Extranjera: Francés': { hours: 4, paths: ['Ciencias Sociales', 'Humanidades'], id: '1o1slef' },
+        'Segunda Lengua Extranjera: Alemán': { hours: 4, paths: ['Ciencias Sociales', 'Humanidades'], id: '1o1slea' },
+        'Dibujo I': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico'], id: '1o1d' },
+        'Literatura Universal': { hours: 4, paths: ['Humanidades'], id: '1o1lu' }
     },
     'OPTATIVA 2 (elegir 1)': {
-        'Educación para la Ciudadanía y los Derechos Humanos': { hours: 1 },
-        'Sociedad, Medio Ambiente y territorios sostenibles': { hours: 1 },
-        'Oratoria': { hours: 1 },
-        'Cultura y Patrimonio de Aragón': { hours: 1 },
-        'Unión Europea': { hours: 1 }
+        'Educación para la Ciudadanía y los Derechos Humanos': { hours: 1, id: '1o2ecdh' },
+        'Sociedad, Medio Ambiente y territorios sostenibles': { hours: 1, id: '1o2smats' },
+        'Oratoria': { hours: 1, id: '1o2o' },
+        'Cultura y Patrimonio de Aragón': { hours: 1, id: '1o2cpa' },
+        'Unión Europea': { hours: 1, id: '1o2ue' }
     },
     'OPTATIVA 3': {
-        'Religión Cristiana/Evangélica/Islámica': { hours: 2 }
+        'Religión Cristiana/Evangélica/Islámica': { hours: 2, id: '1o3rcei' }
     }
 };
 
 const subjects2BACH = {
     'TRONCALES OBLIGATORIAS': {
-        'Historia de la Filosofía': { hours: 3, common: true },
-        'Lengua Castellana y Literatura II': { hours: 4, common: true },
-        'Lengua extranjera II: Inglés': { hours: 3, common: true },
-        'Historia de España': { hours: 3, common: true },
-        'Tutoría': { hours: 1, common: true }
+        'Historia de la Filosofía': { hours: 3, common: true, id: '2tohf' },
+        'Lengua Castellana y Literatura II': { hours: 4, common: true, id: '2tolcl2' },
+        'Lengua extranjera II: Inglés': { hours: 3, common: true, id: '2tolei2' },
+        'Historia de España': { hours: 3, common: true, id: '2tohe' },
+        'Tutoría': { hours: 1, common: true, id: '2tot' }
     },
     'TRONCAL DE MODALIDAD 1': {
-        'Química': { hours: 4, paths: ['Ciencias de la Salud'] },
-        'Física': { hours: 4, paths: ['Tecnológico'] },
-        'Geografía': { hours: 4, paths: ['Ciencias Sociales'] },
-        'Historia del Arte': { hours: 4, paths: ['Humanidades'] }
+        'Química': { hours: 4, paths: ['Ciencias de la Salud'], id: '2tm1q' },
+        'Física': { hours: 4, paths: ['Tecnológico'], id: '2tm1f' },
+        'Geografía': { hours: 4, paths: ['Ciencias Sociales'], id: '2tm1g' },
+        'Historia del Arte': { hours: 4, paths: ['Humanidades'], id: '2tm1ha' }
     },
     'TRONCAL DE MODALIDAD 2': {
-        'Biología': { hours: 4, paths: ['Ciencias de la Salud'] },
-        'Tecnología e Ingeniería II': { hours: 4, paths: ['Tecnológico'] },
-        'Empresa y diseño de modelos de negocio': { hours: 4, paths: ['Ciencias Sociales'] },
-        'Griego II': { hours: 4, paths: ['Humanidades'] }
+        'Biología': { hours: 4, paths: ['Ciencias de la Salud'], id: '2tm2b' },
+        'Tecnología e Ingeniería II': { hours: 4, paths: ['Tecnológico'], id: '2tm2ti2' },
+        'Empresa y diseño de modelos de negocio': { hours: 4, paths: ['Ciencias Sociales'], id: '2tm2edmn' },
+        'Griego II': { hours: 4, paths: ['Humanidades'], id: '2tm2g2' }
     },
     'TRONCAL DE MODALIDAD 3': {
-        'Matemáticas II': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico'] },
-        'Matemáticas CC.SS II': { hours: 4, paths: ['Ciencias Sociales'] },
-        'Latín II': { hours: 4, paths: ['Humanidades'] }
+        'Matemáticas II': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico'], id: '2tm3m2' },
+        'Matemáticas CC.SS II': { hours: 4, paths: ['Ciencias Sociales'], id: '2tm3mccs2' },
+        'Latín II': { hours: 4, paths: ['Humanidades'], id: '2tm3l2' }
     },
     'Optativa (elegir 1 de 4 horas)': {
-        'Tecnología e Ingeniería II': { hours: 4, paths: ['Ciencias de la Salud'] },
-        'Dibujo Técnico II': { hours: 4, paths: ['Tecnológico'] },
-        'Fundamentos de Administración y Gestión': { hours: 4, paths: ['Ciencias Sociales', 'Humanidades'] },
-        'Geología y Ciencias Ambientales': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico'] },
-        'Historia del Arte': { hours: 4, paths: ['Ciencias Sociales'] },
-        'Geografía': { hours: 4, paths: ['Humanidades'] },
-        'Ciencias de la Tierra y del Medioambiente': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico', 'Ciencias Sociales', 'Humanidades'] },
-        'Física': { hours: 4, paths: ['Ciencias de la Salud'] },
-        'Química': { hours: 4, paths: ['Tecnológico'] }
+        'Tecnología e Ingeniería II': { hours: 4, paths: ['Ciencias de la Salud'], id: '2oti2' },
+        'Dibujo Técnico II': { hours: 4, paths: ['Tecnológico'], id: '2odt2' },
+        'Fundamentos de Administración y Gestión': { hours: 4, paths: ['Ciencias Sociales', 'Humanidades'], id: '2ofag' },
+        'Geología y Ciencias Ambientales': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico'], id: '2ogca' },
+        'Historia del Arte': { hours: 4, paths: ['Ciencias Sociales'], id: '2oha' },
+        'Geografía': { hours: 4, paths: ['Humanidades'], id: '2og' },
+        'Ciencias de la Tierra y del Medioambiente': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico', 'Ciencias Sociales', 'Humanidades'], id: '2octm' },
+        'Física': { hours: 4, paths: ['Ciencias de la Salud'], id: '2of' },
+        'Química': { hours: 4, paths: ['Tecnológico'], id: '2oq' }
     },
     'Optativas': {
-        'Psicología': { hours: 3 },
-        'Informática II': { hours: 3 },
-        'Segunda Lengua Extranjera II: Francés': { hours: 3 },
-        'Educación Física y Vida Activa': { hours: 1 },
-        'Proyecto de Investigación e Innovación integrado': { hours: 1 }
+        'Psicología': { hours: 3, id: '2op' },
+        'Informática II': { hours: 3, id: '2oi2' },
+        'Segunda Lengua Extranjera II: Francés': { hours: 3, id: '2osle2f' },
+        'Educación Física y Vida Activa': { hours: 1, id: '2oefva' },
+        'Proyecto de Investigación e Innovación integrado': { hours: 1, id: '2opiii' }
     }
 };
 
