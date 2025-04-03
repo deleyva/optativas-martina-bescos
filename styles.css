@@ -41,6 +41,8 @@ h1 {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     cursor: pointer;
     transition: transform 0.2s;
+    position: relative;
+    z-index: 1;
 }
 
 .subject-card:hover {
@@ -92,26 +94,22 @@ h1 {
 }
 
 .category-header {
-    width: 100%;
-    padding: 1rem;
     background: var(--primary-color);
     color: white;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 4px;
     font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 8px;
+    grid-column: 1 / -1;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    margin-top: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.category-header::after {
-    content: '▼';
-    transition: transform 0.3s ease;
-    display: inline-block;
-}
-
-.category-header.collapsed::after {
-    transform: rotate(-90deg);
+.category-header + .category-header {
+    margin-top: 1rem;
 }
 
 .category-content {
@@ -266,9 +264,5 @@ dialog::backdrop {
         max-height: 0;
         padding: 0;
         opacity: 0;
-    }
-
-    .category-header::after {
-        transform: rotate(-90deg);
     }
 }
