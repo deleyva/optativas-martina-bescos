@@ -4,37 +4,47 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 const subjects = {
     'TRONCALES OBLIGATORIAS': {
-        'Geografía e Historia': { academic: 3, applied: 3 },
-        'Lengua Castellana y Literatura': { academic: 4, applied: 4 },
-        'Matemáticas': { academic: 4, applied: 4 },
-        'Primera Lengua Extranjera': { academic: 4, applied: 4 }
+        'Geografía e Historia': { hours: 3, common: true },
+        'Lengua Castellana y Literatura': { hours: 4, common: true },
+        'Inglés Brit/No Brit': { hours: 4, common: true },
+        'Matemáticas': { 
+            'Matemáticas B': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico', 'Humanidades y Ciencias Sociales'] },
+            'Matemáticas A': { hours: 4, paths: ['Formación Profesional'] }
+        },
+        'Educación Física': { hours: 2, common: true },
+        'Tutoría': { hours: 1, common: true }
     },
-    'TRONCALES ACADÉMICAS DE OPCIÓN': {
-        'Biología y Geología': { academic: 3 },
-        'Física y Química': { academic: 3 },
-        'Economía': { academic: 3 },
-        'Latín': { academic: 3 }
+    'TRONCAL DE MODALIDAD 1': {
+        'Física y Química': { hours: 3, paths: ['Ciencias de la Salud', 'Tecnológico'] },
+        'Economía y Empresa': { hours: 3, paths: ['Humanidades y Ciencias Sociales'] },
+        'Formación y Orientación Profesional': { hours: 3, paths: ['Formación Profesional', 'Diversificación Curricular'] }
     },
-    'TRONCALES APLICADAS DE OPCIÓN': {
-        'Ciencias Aplicadas a la Actividad Profesional': { applied: 3 },
-        'Iniciación a la Actividad Emprendedora y Empresarial': { applied: 3 },
-        'Tecnología': { applied: 3 }
+    'TRONCAL DE MODALIDAD 2': {
+        'Biología y Geología': { hours: 3, paths: ['Ciencias de la Salud'] },
+        'Tecnología brit/ no brit': { hours: 3, paths: ['Tecnológico', 'Formación Profesional'] },
+        'Latín': { hours: 3, paths: ['Humanidades y Ciencias Sociales'] },
+        'Economía y Empresa': { hours: 3, paths: ['Formación Profesional'] }
     },
-    'ESPECÍFICAS OBLIGATORIAS': {
-        'Educación Física': { academic: 2, applied: 2 },
-        'Religión o Valores Éticos': { academic: 1, applied: 1 }
+    'TRONCAL DE MODALIDAD 3': {
+        'Cultura Científica': { hours: 2, common: true },
+        'Cultura Clásica': { hours: 2, paths: ['Ciencias de la Salud', 'Tecnológico', 'Humanidades y Ciencias Sociales', 'Formación Profesional'] },
+        'Filosofía': { hours: 2, paths: ['Ciencias de la Salud', 'Tecnológico', 'Humanidades y Ciencias Sociales', 'Formación Profesional'] },
+        'Artes escénicas y danza': { hours: 2, common: true },
+        'Matemáticas Aplicadas a la toma de decisiones': { hours: 2, common: true }
     },
-    'ESPECÍFICAS OPCIONALES/LIBRE CONFIGURACIÓN AUTONÓMICA': {
-        'Educación Plástica, Visual y Audiovisual': { academic: 3, applied: 3 },
-        'Segunda Lengua Extranjera': { academic: 3, applied: 3 },
-        'Materia troncal no cursada': {},
-        'Música': {},
-        'Tecnología': {},
-        'Cultura Clásica': {},
-        'Filosofía': { academic: 2, applied: 2 },
-        'Artes Escénicas y Danza': {},
-        'Cultura Científica': {},
-        'Tecnologías de la Información y la Comunicación': {}
+    'OPTATIVAS': {
+        'Francés': { hours: 3, common: true },
+        'Alemán': { hours: 3, common: true },
+        'Música Brit/ no Brit': { hours: 3, common: true },
+        'Digitalización Brit /no Brit': { hours: 3, common: true },
+        'Expresión artística': { hours: 3, common: true },
+        'Tecnología Brit /no Brit': { hours: 3, paths: ['Ciencias de la Salud'] },
+        'Biología': { hours: 3, paths: ['Tecnológico'] }
+    },
+    'ÁMBITOS': {
+        'Ámbito lingüístico y social': { hours: 11, paths: ['Diversificación Curricular'] },
+        'Ámbito científico-tecnológico': { hours: 7, paths: ['Diversificación Curricular'] },
+        'Ámbito práctico': { hours: 3, paths: ['Diversificación Curricular'] }
     }
 };
 
@@ -90,9 +100,8 @@ function createSubjectCard(subject, hours, category) {
     card.innerHTML = `
         <div class="subject-header">${subject}</div>
         <div class="subject-hours">
-            ${hours.academic ? `Académicas: ${hours.academic}h` : ''}
-            ${hours.academic && hours.applied ? ' | ' : ''}
-            ${hours.applied ? `Aplicadas: ${hours.applied}h` : ''}
+            ${hours.hours ? `Horas: ${hours.hours}h` : ''}<br>
+            ${hours.paths ? `Itinerarios: ${hours.paths.join(', ')}` : ''}
         </div>
     `;
     
@@ -113,8 +122,8 @@ function showSubjectDetail(subject, hours, category, details) {
         <h2>${subject}</h2>
         <p><strong>Categoría:</strong> ${category}</p>
         <p><strong>Horas:</strong><br>
-        ${hours.academic ? `Académicas: ${hours.academic}h<br>` : ''}
-        ${hours.applied ? `Aplicadas: ${hours.applied}h` : ''}</p>
+        ${hours.hours ? `Horas: ${hours.hours}h<br>` : ''}
+        ${hours.paths ? `Itinerarios: ${hours.paths.join(', ')}` : ''}</p>
         ${details ? `
             <h3>Descripción:</h3>
             <p>${details.description}</p>
@@ -139,8 +148,15 @@ function initialize() {
         container.appendChild(categoryHeader);
         
         for (const [subject, hours] of Object.entries(subjectList)) {
-            const card = createSubjectCard(subject, hours, category);
-            container.appendChild(card);
+            if (typeof hours === 'object' && !hours.hours) {
+                for (const [subSubject, subHours] of Object.entries(hours)) {
+                    const card = createSubjectCard(`${subject} - ${subSubject}`, subHours, category);
+                    container.appendChild(card);
+                }
+            } else {
+                const card = createSubjectCard(subject, hours, category);
+                container.appendChild(card);
+            }
         }
     }
     
@@ -148,6 +164,26 @@ function initialize() {
     document.getElementById('back-button').addEventListener('click', () => {
         document.getElementById('main-content').classList.remove('hidden');
         document.getElementById('detail-view').classList.add('hidden');
+    });
+
+    // Distribution dialog functionality
+    const dialog = document.getElementById('distribution-dialog');
+    const showButton = document.getElementById('show-distribution');
+    const closeButton = dialog.querySelector('.close-dialog');
+
+    showButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        dialog.showModal();
+    });
+
+    closeButton.addEventListener('click', () => {
+        dialog.close();
+    });
+
+    dialog.addEventListener('click', (e) => {
+        if (e.target === dialog) {
+            dialog.close();
+        }
     });
 }
 
