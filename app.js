@@ -71,11 +71,99 @@ const subjects4ESO = {
     }
 };
 
+const subjects1BACH = {
+    'TRONCALES OBLIGATORIAS': {
+        'Filosofía': { hours: 3, common: true },
+        'Lengua Castellana y Literatura I': { hours: 3, common: true },
+        'Lengua Extranjera I: Inglés': { hours: 3, common: true },
+        'Educación Física': { hours: 2, common: true },
+        'Tutoría': { hours: 1, common: true }
+    },
+    'TRONCAL DE MODALIDAD 1': {
+        'Física y Química': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico'] },
+        'Economía': { hours: 4, paths: ['Ciencias Sociales'] },
+        'Griego I': { hours: 4, paths: ['Humanidades'] }
+    },
+    'TRONCAL DE MODALIDAD 2': {
+        'Biología y Geología': { hours: 4, paths: ['Ciencias de la Salud'] },
+        'Tecnología': { hours: 4, paths: ['Tecnológico'] },
+        'Historia del mundo contemporáneo': { hours: 4, paths: ['Ciencias Sociales', 'Humanidades'] }
+    },
+    'TRONCAL DE MODALIDAD 3': {
+        'Matemáticas I': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico'] },
+        'Matemáticas CC.SS I': { hours: 4, paths: ['Ciencias Sociales'] },
+        'Latín I': { hours: 4, paths: ['Humanidades'] }
+    },
+    'OPTATIVA 1 (elegir 1)': {
+        'Informática I': { hours: 4, paths: ['Tecnológico', 'Humanidades'] },
+        'Anatomía Aplicada': { hours: 4, paths: ['Ciencias de la Salud', 'Humanidades'] },
+        'Segunda Lengua Extranjera: Francés': { hours: 4, paths: ['Ciencias Sociales', 'Humanidades'] },
+        'Segunda Lengua Extranjera: Alemán': { hours: 4, paths: ['Ciencias Sociales', 'Humanidades'] },
+        'Dibujo I': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico'] },
+        'Literatura Universal': { hours: 4, paths: ['Humanidades'] }
+    },
+    'OPTATIVA 2 (elegir 1)': {
+        'Educación para la Ciudadanía y los Derechos Humanos': { hours: 1 },
+        'Sociedad, Medio Ambiente y territorios sostenibles': { hours: 1 },
+        'Oratoria': { hours: 1 },
+        'Cultura y Patrimonio de Aragón': { hours: 1 },
+        'Unión Europea': { hours: 1 }
+    },
+    'OPTATIVA 3': {
+        'Religión Cristiana/Evangélica/Islámica': { hours: 2 }
+    }
+};
+
+const subjects2BACH = {
+    'TRONCALES OBLIGATORIAS': {
+        'Historia de la Filosofía': { hours: 3, common: true },
+        'Lengua Castellana y Literatura II': { hours: 4, common: true },
+        'Lengua extranjera II: Inglés': { hours: 3, common: true },
+        'Historia de España': { hours: 3, common: true },
+        'Tutoría': { hours: 1, common: true }
+    },
+    'TRONCAL DE MODALIDAD 1': {
+        'Química': { hours: 4, paths: ['Ciencias de la Salud'] },
+        'Física': { hours: 4, paths: ['Tecnológico'] },
+        'Geografía': { hours: 4, paths: ['Ciencias Sociales'] },
+        'Historia del Arte': { hours: 4, paths: ['Humanidades'] }
+    },
+    'TRONCAL DE MODALIDAD 2': {
+        'Biología': { hours: 4, paths: ['Ciencias de la Salud'] },
+        'Tecnología e Ingeniería II': { hours: 4, paths: ['Tecnológico'] },
+        'Empresa y diseño de modelos de negocio': { hours: 4, paths: ['Ciencias Sociales'] },
+        'Griego II': { hours: 4, paths: ['Humanidades'] }
+    },
+    'TRONCAL DE MODALIDAD 3': {
+        'Matemáticas II': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico'] },
+        'Matemáticas CC.SS II': { hours: 4, paths: ['Ciencias Sociales'] },
+        'Latín II': { hours: 4, paths: ['Humanidades'] }
+    },
+    'Optativa (elegir 1 de 4 horas)': {
+        'Tecnología e Ingeniería II': { hours: 4, paths: ['Ciencias de la Salud'] },
+        'Dibujo Técnico II': { hours: 4, paths: ['Tecnológico'] },
+        'Fundamentos de Administración y Gestión': { hours: 4, paths: ['Ciencias Sociales', 'Humanidades'] },
+        'Geología y Ciencias Ambientales': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico'] },
+        'Historia del Arte': { hours: 4, paths: ['Ciencias Sociales'] },
+        'Geografía': { hours: 4, paths: ['Humanidades'] },
+        'Ciencias de la Tierra y del Medioambiente': { hours: 4, paths: ['Ciencias de la Salud', 'Tecnológico', 'Ciencias Sociales', 'Humanidades'] },
+        'Física': { hours: 4, paths: ['Ciencias de la Salud'] },
+        'Química': { hours: 4, paths: ['Tecnológico'] }
+    },
+    'Optativas': {
+        'Psicología': { hours: 3 },
+        'Informática II': { hours: 3 },
+        'Segunda Lengua Extranjera II: Francés': { hours: 3 },
+        'Educación Física y Vida Activa': { hours: 1 },
+        'Proyecto de Investigación e Innovación integrado': { hours: 1 }
+    }
+};
+
 const subjectsByGrade = {
     '3eso': subjects3ESO,
     '4eso': subjects4ESO,
-    '1bach': {},  // Por implementar
-    '2bach': {}   // Por implementar
+    '1bach': subjects1BACH,
+    '2bach': subjects2BACH
 };
 
 const imagesByGrade = {
@@ -225,7 +313,32 @@ function initialize() {
     const navButtons = document.querySelectorAll('.nav-btn');
     const distributionImage = document.querySelector('.distribution-image');
     const downloadButton = document.querySelector('.download-btn');
+    const menuToggle = document.querySelector('.menu-toggle');
+    const nav = document.querySelector('.course-nav');
+    const navButtonsContainer = document.querySelector('.nav-buttons');
     let currentGrade = '3eso';
+    
+    // Menú hamburguesa
+    menuToggle.addEventListener('click', () => {
+        navButtonsContainer.classList.toggle('show');
+        nav.classList.toggle('expanded');
+    });
+    
+    // Cerrar menú al hacer clic en una opción
+    navButtonsContainer.addEventListener('click', (e) => {
+        if (window.innerWidth <= 512 && (e.target.classList.contains('nav-btn') || e.target.classList.contains('icon-btn'))) {
+            navButtonsContainer.classList.remove('show');
+            nav.classList.remove('expanded');
+        }
+    });
+    
+    // Cerrar menú al redimensionar la ventana a un tamaño grande
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 512) {
+            navButtonsContainer.classList.remove('show');
+            nav.classList.remove('expanded');
+        }
+    });
     
     function updateContent(grade) {
         // Limpiar el contenedor
