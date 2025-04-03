@@ -49,30 +49,41 @@ const subjects = {
 };
 
 async function fetchCSVData() {
-    // Check cache first
-    const cachedData = localStorage.getItem(CACHE_KEY);
-    if (cachedData) {
-        const { data, timestamp } = JSON.parse(cachedData);
-        if (Date.now() - timestamp < CACHE_DURATION) {
-            return data;
-        }
-    }
-
     try {
-        const response = await fetch(CSV_URL);
+        const response = await fetch(CSV_URL, {
+            method: "GET",
+            redirect: "follow"
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
         const csvText = await response.text();
-        const data = parseCSV(csvText);
-        
-        // Cache the data
-        localStorage.setItem(CACHE_KEY, JSON.stringify({
-            data,
-            timestamp: Date.now()
-        }));
-        
-        return data;
+        return parseCSV(csvText);
     } catch (error) {
-        console.error('Error fetching CSV:', error);
-        return null;
+        console.warn('Error fetching CSV:', error);
+        // Si falla la petición, devolvemos un objeto con datos por defecto
+        return {
+            'Geografía e Historia': {
+                description: 'Asignatura troncal obligatoria',
+                content: 'Estudio de la geografía y la historia.'
+            },
+            'Lengua Castellana y Literatura': {
+                description: 'Asignatura troncal obligatoria',
+                content: 'Estudio de la lengua española y su literatura.'
+            },
+            'Inglés Brit/No Brit': {
+                description: 'Asignatura troncal obligatoria',
+                content: 'Aprendizaje del idioma inglés.'
+            },
+            'Matemáticas B': {
+                description: 'Matemáticas orientadas a Bachillerato',
+                content: 'Matemáticas para itinerarios académicos.'
+            },
+            'Matemáticas A': {
+                description: 'Matemáticas orientadas a FP',
+                content: 'Matemáticas aplicadas.'
+            }
+        };
     }
 }
 
@@ -118,18 +129,32 @@ function showSubjectDetail(subject, hours, category, details) {
     const detailView = document.getElementById('detail-view');
     const detailContent = document.getElementById('detail-content');
     
+    let description = '';
+    let content = '';
+    
+    if (details) {
+        description = details.description;
+        content = details.content;
+    } else {
+        // Información por defecto si no hay detalles
+        description = `Asignatura de ${category.toLowerCase()}`;
+        if (hours.paths) {
+            content = `Esta asignatura está disponible en los siguientes itinerarios: ${hours.paths.join(', ')}`;
+        } else if (hours.common) {
+            content = 'Esta es una asignatura común para todos los itinerarios.';
+        }
+    }
+    
     detailContent.innerHTML = `
         <h2>${subject}</h2>
         <p><strong>Categoría:</strong> ${category}</p>
-        <p><strong>Horas:</strong><br>
-        ${hours.hours ? `Horas: ${hours.hours}h<br>` : ''}
-        ${hours.paths ? `Itinerarios: ${hours.paths.join(', ')}` : ''}</p>
-        ${details ? `
-            <h3>Descripción:</h3>
-            <p>${details.description}</p>
-            <h3>Contenido:</h3>
-            <p>${details.content}</p>
-        ` : '<p>No hay información adicional disponible.</p>'}
+        <p><strong>Horas:</strong> ${hours.hours}h</p>
+        ${hours.paths ? `<p><strong>Itinerarios:</strong> ${hours.paths.join(', ')}</p>` : ''}
+        ${hours.common ? '<p><strong>Asignatura común</strong></p>' : ''}
+        <h3>Descripción:</h3>
+        <p>${description}</p>
+        <h3>Contenido:</h3>
+        <p>${content}</p>
     `;
     
     mainContent.classList.add('hidden');
