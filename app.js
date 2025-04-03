@@ -3,7 +3,7 @@ let dfSubjects = null;
 
 async function loadCSVData() {
     try {
-        dfSubjects = await dfd.read_csv(CSV_URL);
+        dfSubjects = await dfd.readCSV(CSV_URL);
         return dfSubjects;
     } catch (error) {
         console.error('Error cargando CSV:', error);
