@@ -2,7 +2,35 @@ const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSl4IH5DWI5qDF9
 const CACHE_KEY = 'subjectsData';
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
-const subjects = {
+const subjects3ESO = {
+    'MATERIAS COMUNES': {
+        'Geografía e Historia': { hours: 3, brit: true, nobit: true },
+        'Lengua Castellana': { hours: 4, brit: true, nobit: true },
+        'Matemáticas': { hours: 3, brit: true, nobit: true },
+        'Física y Química': { hours: 2, brit: true, nobit: true },
+        'Biología y Geología': { hours: 2, brit: true, nobit: true },
+        'Educación Física': { hours: 2, brit: true, nobit: true, div: true },
+        'Educación Valores Cívicos y Éticos': { hours: 1, brit: true, nobit: true, div: true },
+        'Tutoría': { hours: 1, brit: true, nobit: true, div: true }
+    },
+    'MATERIAS ESPECÍFICAS': {
+        'Inglés': { hours: 3, brit: 'Brit', nobit: 'No Brit' },
+        'Tecnología': { hours: 3, brit: 'Inglés', nobit: true },
+        'Música': { hours: 3, brit: 'Inglés', nobit: true, div: true }
+    },
+    'ÁMBITOS': {
+        'Ámbito lingüístico y social': { hours: 10, div: true },
+        'Ámbito científico-tecnológico': { hours: 7, div: true },
+        'Ámbito práctico': { hours: 3, div: true }
+    },
+    'OPTATIVAS': {
+        'Religión Cristiana/Evangélica/Islámica/Atención Educativa': { hours: 1, brit: 'Elegir 1', nobit: 'Elegir 1', div: 'Elegir 1' },
+        'Francés/Alemán': { hours: 2, brit: 'Elegir 1', nobit: 'Elegir 1' },
+        'Economía Social/Iniciación Filosofía/Programación y Robótica/Cultura Clásica': { hours: 2, nobit: 'Elegir 1' }
+    }
+};
+
+const subjects4ESO = {
     'TRONCALES OBLIGATORIAS': {
         'Geografía e Historia': { hours: 3, common: true },
         'Lengua Castellana y Literatura': { hours: 4, common: true },
@@ -40,12 +68,21 @@ const subjects = {
         'Expresión artística': { hours: 3, common: true },
         'Tecnología Brit /no Brit': { hours: 3, paths: ['Ciencias de la Salud'] },
         'Biología': { hours: 3, paths: ['Tecnológico'] }
-    },
-    'ÁMBITOS': {
-        'Ámbito lingüístico y social': { hours: 11, paths: ['Diversificación Curricular'] },
-        'Ámbito científico-tecnológico': { hours: 7, paths: ['Diversificación Curricular'] },
-        'Ámbito práctico': { hours: 3, paths: ['Diversificación Curricular'] }
     }
+};
+
+const subjectsByGrade = {
+    '3eso': subjects3ESO,
+    '4eso': subjects4ESO,
+    '1bach': {},  // Por implementar
+    '2bach': {}   // Por implementar
+};
+
+const imagesByGrade = {
+    '3eso': 'optativas3.png',
+    '4eso': 'optativas4.png',
+    '1bach': 'optativas1bach.png',
+    '2bach': 'optativas2bach.png'
 };
 
 async function fetchCSVData() {
@@ -61,29 +98,7 @@ async function fetchCSVData() {
         return parseCSV(csvText);
     } catch (error) {
         console.warn('Error fetching CSV:', error);
-        // Si falla la petición, devolvemos un objeto con datos por defecto
-        return {
-            'Geografía e Historia': {
-                description: 'Asignatura troncal obligatoria',
-                content: 'Estudio de la geografía y la historia.'
-            },
-            'Lengua Castellana y Literatura': {
-                description: 'Asignatura troncal obligatoria',
-                content: 'Estudio de la lengua española y su literatura.'
-            },
-            'Inglés Brit/No Brit': {
-                description: 'Asignatura troncal obligatoria',
-                content: 'Aprendizaje del idioma inglés.'
-            },
-            'Matemáticas B': {
-                description: 'Matemáticas orientadas a Bachillerato',
-                content: 'Matemáticas para itinerarios académicos.'
-            },
-            'Matemáticas A': {
-                description: 'Matemáticas orientadas a FP',
-                content: 'Matemáticas aplicadas.'
-            }
-        };
+        return {};
     }
 }
 
@@ -108,11 +123,28 @@ function parseCSV(csvText) {
 function createSubjectCard(subject, hours, category) {
     const card = document.createElement('div');
     card.className = 'subject-card';
+    
+    let hoursInfo = '';
+    if (hours.hours) {
+        hoursInfo = `<div>Horas: ${hours.hours}h</div>`;
+    }
+    
+    let pathsInfo = '';
+    if (hours.paths) {
+        pathsInfo = `<div>Itinerarios: ${hours.paths.join(', ')}</div>`;
+    } else if (hours.brit || hours.nobit) {
+        let groups = [];
+        if (hours.brit) groups.push(hours.brit === true ? 'Brit' : hours.brit);
+        if (hours.nobit) groups.push(hours.nobit === true ? 'No Brit' : hours.nobit);
+        if (hours.div) groups.push('Diversificación');
+        pathsInfo = `<div>Grupos: ${groups.join(', ')}</div>`;
+    }
+    
     card.innerHTML = `
         <div class="subject-header">${subject}</div>
         <div class="subject-hours">
-            ${hours.hours ? `Horas: ${hours.hours}h` : ''}<br>
-            ${hours.paths ? `Itinerarios: ${hours.paths.join(', ')}` : ''}
+            ${hoursInfo}
+            ${pathsInfo}
         </div>
     `;
     
@@ -136,21 +168,15 @@ function showSubjectDetail(subject, hours, category, details) {
         description = details.description;
         content = details.content;
     } else {
-        // Información por defecto si no hay detalles
         description = `Asignatura de ${category.toLowerCase()}`;
-        if (hours.paths) {
-            content = `Esta asignatura está disponible en los siguientes itinerarios: ${hours.paths.join(', ')}`;
-        } else if (hours.common) {
-            content = 'Esta es una asignatura común para todos los itinerarios.';
-        }
+        content = generateContentDescription(hours);
     }
     
     detailContent.innerHTML = `
         <h2>${subject}</h2>
         <p><strong>Categoría:</strong> ${category}</p>
         <p><strong>Horas:</strong> ${hours.hours}h</p>
-        ${hours.paths ? `<p><strong>Itinerarios:</strong> ${hours.paths.join(', ')}</p>` : ''}
-        ${hours.common ? '<p><strong>Asignatura común</strong></p>' : ''}
+        ${generateDetailInfo(hours)}
         <h3>Descripción:</h3>
         <p>${description}</p>
         <h3>Contenido:</h3>
@@ -161,29 +187,89 @@ function showSubjectDetail(subject, hours, category, details) {
     detailView.classList.remove('hidden');
 }
 
+function generateContentDescription(hours) {
+    if (hours.paths) {
+        return `Esta asignatura está disponible en los siguientes itinerarios: ${hours.paths.join(', ')}`;
+    } else if (hours.brit || hours.nobit) {
+        let groups = [];
+        if (hours.brit) groups.push(hours.brit === true ? 'Brit' : hours.brit);
+        if (hours.nobit) groups.push(hours.nobit === true ? 'No Brit' : hours.nobit);
+        if (hours.div) groups.push('Diversificación');
+        return `Esta asignatura está disponible para los siguientes grupos: ${groups.join(', ')}`;
+    } else if (hours.common) {
+        return 'Esta es una asignatura común para todos los itinerarios.';
+    }
+    return '';
+}
+
+function generateDetailInfo(hours) {
+    let info = '';
+    if (hours.paths) {
+        info += `<p><strong>Itinerarios:</strong> ${hours.paths.join(', ')}</p>`;
+    }
+    if (hours.brit || hours.nobit) {
+        let groups = [];
+        if (hours.brit) groups.push(hours.brit === true ? 'Brit' : hours.brit);
+        if (hours.nobit) groups.push(hours.nobit === true ? 'No Brit' : hours.nobit);
+        if (hours.div) groups.push('Diversificación');
+        info += `<p><strong>Grupos:</strong> ${groups.join(', ')}</p>`;
+    }
+    if (hours.common) {
+        info += '<p><strong>Asignatura común</strong></p>';
+    }
+    return info;
+}
+
 function initialize() {
     const container = document.querySelector('.grid-container');
+    const navButtons = document.querySelectorAll('.nav-btn');
+    const distributionImage = document.querySelector('.distribution-image');
+    let currentGrade = '3eso';
     
-    // Add categories and subjects
-    for (const [category, subjectList] of Object.entries(subjects)) {
-        const categoryHeader = document.createElement('div');
-        categoryHeader.className = 'category-header';
-        categoryHeader.style.gridColumn = '1 / -1';
-        categoryHeader.textContent = category;
-        container.appendChild(categoryHeader);
+    function updateContent(grade) {
+        // Limpiar el contenedor
+        container.innerHTML = '';
         
-        for (const [subject, hours] of Object.entries(subjectList)) {
-            if (typeof hours === 'object' && !hours.hours) {
-                for (const [subSubject, subHours] of Object.entries(hours)) {
-                    const card = createSubjectCard(`${subject} - ${subSubject}`, subHours, category);
+        // Actualizar botones de navegación
+        navButtons.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.course === grade);
+        });
+        
+        // Actualizar la imagen de distribución
+        distributionImage.src = imagesByGrade[grade];
+        distributionImage.alt = `Distribución de asignaturas de ${grade.toUpperCase()}`;
+        
+        // Obtener los datos del curso seleccionado
+        const subjects = subjectsByGrade[grade];
+        
+        // Añadir categorías y asignaturas
+        for (const [category, subjectList] of Object.entries(subjects)) {
+            const categoryHeader = document.createElement('div');
+            categoryHeader.className = 'category-header';
+            categoryHeader.textContent = category;
+            container.appendChild(categoryHeader);
+            
+            for (const [subject, hours] of Object.entries(subjectList)) {
+                if (typeof hours === 'object' && !hours.hours) {
+                    for (const [subSubject, subHours] of Object.entries(hours)) {
+                        const card = createSubjectCard(`${subject} - ${subSubject}`, subHours, category);
+                        container.appendChild(card);
+                    }
+                } else {
+                    const card = createSubjectCard(subject, hours, category);
                     container.appendChild(card);
                 }
-            } else {
-                const card = createSubjectCard(subject, hours, category);
-                container.appendChild(card);
             }
         }
     }
+    
+    // Event listeners para los botones de navegación
+    navButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentGrade = btn.dataset.course;
+            updateContent(currentGrade);
+        });
+    });
     
     // Back button functionality
     document.getElementById('back-button').addEventListener('click', () => {
@@ -210,6 +296,9 @@ function initialize() {
             dialog.close();
         }
     });
+    
+    // Inicializar con 3º ESO
+    updateContent(currentGrade);
 }
 
 // Initialize the app when DOM is loaded

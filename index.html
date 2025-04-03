@@ -3,13 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Optativas</title>
+    <title>Optativas - IES Alixar</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="app">
+        <nav class="course-nav">
+            <div class="nav-header">
+                <img src="icono-ies.png" alt="Logo IES" class="nav-logo">
+                <span class="nav-title">Optativas</span>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn active" data-course="3eso">3º ESO</button>
+                <button class="nav-btn" data-course="4eso">4º ESO</button>
+                <button class="nav-btn" data-course="1bach">1º Bach</button>
+                <button class="nav-btn" data-course="2bach">2º Bach</button>
+            </div>
+        </nav>
         <div id="main-content">
-            <h1>Asignaturas</h1>
             <a href="#" id="show-distribution" class="distribution-link">Ver distribución original</a>
             <div class="grid-container"></div>
         </div>
