@@ -234,6 +234,7 @@ function createSubjectCard(subject, hours, category) {
             ${hoursInfo}
             ${pathsInfo}
         </div>
+        <div class="subject-id">${hours.id || ''}</div>
     `;
     
     card.addEventListener('click', async () => {

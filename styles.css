@@ -50,13 +50,27 @@ h1 {
 }
 
 .subject-header {
-    font-weight: bold;
+    font-weight: 600;
     margin-bottom: 0.5rem;
 }
 
 .subject-hours {
     color: #666;
     font-size: 0.9rem;
+}
+
+.subject-id {
+    position: absolute;
+    bottom: 4px;
+    left: 8px;
+    font-size: 0.7rem;
+    color: #999;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.subject-card:hover .subject-id {
+    opacity: 1;
 }
 
 .hidden {
