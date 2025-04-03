@@ -224,6 +224,7 @@ function initialize() {
     const container = document.querySelector('.grid-container');
     const navButtons = document.querySelectorAll('.nav-btn');
     const distributionImage = document.querySelector('.distribution-image');
+    const downloadButton = document.querySelector('.download-btn');
     let currentGrade = '3eso';
     
     function updateContent(grade) {
@@ -235,9 +236,12 @@ function initialize() {
             btn.classList.toggle('active', btn.dataset.course === grade);
         });
         
-        // Actualizar la imagen de distribución
-        distributionImage.src = imagesByGrade[grade];
+        // Actualizar la imagen de distribución y el enlace de descarga
+        const imagePath = imagesByGrade[grade];
+        distributionImage.src = imagePath;
         distributionImage.alt = `Distribución de asignaturas de ${grade.toUpperCase()}`;
+        downloadButton.href = imagePath;
+        downloadButton.download = `distribucion-${grade}.png`;
         
         // Obtener los datos del curso seleccionado
         const subjects = subjectsByGrade[grade];
