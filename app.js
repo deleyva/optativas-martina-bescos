@@ -1,6 +1,15 @@
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSl4IH5DWI5qDF9LlD22xboXP95U9pbFCsSv77ftcMO7_-eayci5tTS4HMrZOB0eeARjaHfwbtiPS9m/pub?gid=0&single=true&output=csv';
-const CACHE_KEY = 'subjectsData';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+let dfSubjects = null;
+
+async function loadCSVData() {
+    try {
+        dfSubjects = await dfd.read_csv(CSV_URL);
+        return dfSubjects;
+    } catch (error) {
+        console.error('Error cargando CSV:', error);
+        return null;
+    }
+}
 
 const subjects3ESO = {
     'MATERIAS COMUNES': {
@@ -173,41 +182,6 @@ const imagesByGrade = {
     '2bach': 'optativas2bach.png'
 };
 
-async function fetchCSVData() {
-    try {
-        const response = await fetch(CSV_URL, {
-            method: "GET",
-            redirect: "follow"
-        });
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const csvText = await response.text();
-        return parseCSV(csvText);
-    } catch (error) {
-        console.warn('Error fetching CSV:', error);
-        return {};
-    }
-}
-
-function parseCSV(csvText) {
-    const lines = csvText.split('\n');
-    const headers = lines[0].split(',');
-    const result = {};
-    
-    for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(',');
-        if (values.length === headers.length) {
-            result[values[0]] = {
-                description: values[1]?.trim() || '',
-                content: values[2]?.trim() || ''
-            };
-        }
-    }
-    
-    return result;
-}
-
 function createSubjectCard(subject, hours, category) {
     const card = document.createElement('div');
     card.className = 'subject-card';
@@ -227,9 +201,15 @@ function createSubjectCard(subject, hours, category) {
         if (hours.div) groups.push('Diversificación');
         pathsInfo = `<div>Grupos: ${groups.join(', ')}</div>`;
     }
+
+    // Verificar si hay información detallada disponible
+    const hasDetails = dfSubjects && hours.id && dfSubjects.query(dfSubjects['Identificador'].eq(hours.id)).shape[0] > 0;
     
     card.innerHTML = `
-        <div class="subject-header">${subject}</div>
+        <div class="subject-header">
+            ${subject}
+            ${hasDetails ? '<i class="fas fa-info-circle info-icon"></i>' : ''}
+        </div>
         <div class="subject-hours">
             ${hoursInfo}
             ${pathsInfo}
@@ -237,58 +217,48 @@ function createSubjectCard(subject, hours, category) {
         <div class="subject-id">${hours.id || ''}</div>
     `;
     
-    card.addEventListener('click', async () => {
-        const csvData = await fetchCSVData();
-        showSubjectDetail(subject, hours, category, csvData?.[subject]);
-    });
+    if (hasDetails) {
+        card.classList.add('has-details');
+        card.addEventListener('click', () => showSubjectDetail(subject, hours, category));
+    }
     
     return card;
 }
 
-function showSubjectDetail(subject, hours, category, details) {
+async function showSubjectDetail(subject, hours, category) {
     const mainContent = document.getElementById('main-content');
     const detailView = document.getElementById('detail-view');
     const detailContent = document.getElementById('detail-content');
     
-    let description = '';
-    let content = '';
-    
-    if (details) {
-        description = details.description;
-        content = details.content;
-    } else {
-        description = `Asignatura de ${category.toLowerCase()}`;
-        content = generateContentDescription(hours);
-    }
+    // Obtener los detalles del CSV
+    const subjectData = dfSubjects.query(dfSubjects['Identificador'].eq(hours.id));
+    const details = {
+        queEs: subjectData['¿Qué es?'].values[0],
+        paraQue: subjectData['¿Para qué sirve?'].values[0],
+        quienRecomendamos: subjectData['¿A quién la recomendamos?'].values[0]
+    };
     
     detailContent.innerHTML = `
         <h2>${subject}</h2>
         <p><strong>Categoría:</strong> ${category}</p>
         <p><strong>Horas:</strong> ${hours.hours}h</p>
         ${generateDetailInfo(hours)}
-        <h3>Descripción:</h3>
-        <p>${description}</p>
-        <h3>Contenido:</h3>
-        <p>${content}</p>
+        <div class="detail-section">
+            <h3>¿Qué es?</h3>
+            <p>${details.queEs || 'No hay información disponible'}</p>
+        </div>
+        <div class="detail-section">
+            <h3>¿Para qué sirve?</h3>
+            <p>${details.paraQue || 'No hay información disponible'}</p>
+        </div>
+        <div class="detail-section">
+            <h3>¿A quién la recomendamos?</h3>
+            <p>${details.quienRecomendamos || 'No hay información disponible'}</p>
+        </div>
     `;
     
     mainContent.classList.add('hidden');
     detailView.classList.remove('hidden');
-}
-
-function generateContentDescription(hours) {
-    if (hours.paths) {
-        return `Esta asignatura está disponible en los siguientes itinerarios: ${hours.paths.join(', ')}`;
-    } else if (hours.brit || hours.nobit) {
-        let groups = [];
-        if (hours.brit) groups.push(hours.brit === true ? 'Brit' : hours.brit);
-        if (hours.nobit) groups.push(hours.nobit === true ? 'No Brit' : hours.nobit);
-        if (hours.div) groups.push('Diversificación');
-        return `Esta asignatura está disponible para los siguientes grupos: ${groups.join(', ')}`;
-    } else if (hours.common) {
-        return 'Esta es una asignatura común para todos los itinerarios.';
-    }
-    return '';
 }
 
 function generateDetailInfo(hours) {
@@ -319,104 +289,107 @@ function initialize() {
     const navButtonsContainer = document.querySelector('.nav-buttons');
     let currentGrade = '3eso';
     
-    // Menú hamburguesa
-    menuToggle.addEventListener('click', () => {
-        navButtonsContainer.classList.toggle('show');
-        nav.classList.toggle('expanded');
-    });
-    
-    // Cerrar menú al hacer clic en una opción
-    navButtonsContainer.addEventListener('click', (e) => {
-        if (window.innerWidth <= 512 && (e.target.classList.contains('nav-btn') || e.target.classList.contains('icon-btn'))) {
-            navButtonsContainer.classList.remove('show');
-            nav.classList.remove('expanded');
-        }
-    });
-    
-    // Cerrar menú al redimensionar la ventana a un tamaño grande
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 512) {
-            navButtonsContainer.classList.remove('show');
-            nav.classList.remove('expanded');
-        }
-    });
-    
-    function updateContent(grade) {
-        // Limpiar el contenedor
-        container.innerHTML = '';
-        
-        // Actualizar botones de navegación
-        navButtons.forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.course === grade);
+    // Cargar datos del CSV antes de inicializar la interfaz
+    loadCSVData().then(() => {
+        // Menú hamburguesa
+        menuToggle.addEventListener('click', () => {
+            navButtonsContainer.classList.toggle('show');
+            nav.classList.toggle('expanded');
         });
         
-        // Actualizar la imagen de distribución y el enlace de descarga
-        const imagePath = imagesByGrade[grade];
-        distributionImage.src = imagePath;
-        distributionImage.alt = `Distribución de asignaturas de ${grade.toUpperCase()}`;
-        downloadButton.href = imagePath;
-        downloadButton.download = `distribucion-${grade}.png`;
+        // Cerrar menú al hacer clic en una opción
+        navButtonsContainer.addEventListener('click', (e) => {
+            if (window.innerWidth <= 512 && (e.target.classList.contains('nav-btn') || e.target.classList.contains('icon-btn'))) {
+                navButtonsContainer.classList.remove('show');
+                nav.classList.remove('expanded');
+            }
+        });
         
-        // Obtener los datos del curso seleccionado
-        const subjects = subjectsByGrade[grade];
+        // Cerrar menú al redimensionar la ventana a un tamaño grande
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 512) {
+                navButtonsContainer.classList.remove('show');
+                nav.classList.remove('expanded');
+            }
+        });
         
-        // Añadir categorías y asignaturas
-        for (const [category, subjectList] of Object.entries(subjects)) {
-            const categoryHeader = document.createElement('div');
-            categoryHeader.className = 'category-header';
-            categoryHeader.textContent = category;
-            container.appendChild(categoryHeader);
+        function updateContent(grade) {
+            // Limpiar el contenedor
+            container.innerHTML = '';
             
-            for (const [subject, hours] of Object.entries(subjectList)) {
-                if (typeof hours === 'object' && !hours.hours) {
-                    for (const [subSubject, subHours] of Object.entries(hours)) {
-                        const card = createSubjectCard(`${subject} - ${subSubject}`, subHours, category);
+            // Actualizar botones de navegación
+            navButtons.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.course === grade);
+            });
+            
+            // Actualizar la imagen de distribución y el enlace de descarga
+            const imagePath = imagesByGrade[grade];
+            distributionImage.src = imagePath;
+            distributionImage.alt = `Distribución de asignaturas de ${grade.toUpperCase()}`;
+            downloadButton.href = imagePath;
+            downloadButton.download = `distribucion-${grade}.png`;
+            
+            // Obtener los datos del curso seleccionado
+            const subjects = subjectsByGrade[grade];
+            
+            // Añadir categorías y asignaturas
+            for (const [category, subjectList] of Object.entries(subjects)) {
+                const categoryHeader = document.createElement('div');
+                categoryHeader.className = 'category-header';
+                categoryHeader.textContent = category;
+                container.appendChild(categoryHeader);
+                
+                for (const [subject, hours] of Object.entries(subjectList)) {
+                    if (typeof hours === 'object' && !hours.hours) {
+                        for (const [subSubject, subHours] of Object.entries(hours)) {
+                            const card = createSubjectCard(`${subject} - ${subSubject}`, subHours, category);
+                            container.appendChild(card);
+                        }
+                    } else {
+                        const card = createSubjectCard(subject, hours, category);
                         container.appendChild(card);
                     }
-                } else {
-                    const card = createSubjectCard(subject, hours, category);
-                    container.appendChild(card);
                 }
             }
         }
-    }
-    
-    // Event listeners para los botones de navegación
-    navButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            currentGrade = btn.dataset.course;
-            updateContent(currentGrade);
+        
+        // Event listeners para los botones de navegación
+        navButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentGrade = btn.dataset.course;
+                updateContent(currentGrade);
+            });
         });
-    });
-    
-    // Back button functionality
-    document.getElementById('back-button').addEventListener('click', () => {
-        document.getElementById('main-content').classList.remove('hidden');
-        document.getElementById('detail-view').classList.add('hidden');
-    });
+        
+        // Back button functionality
+        document.getElementById('back-button').addEventListener('click', () => {
+            document.getElementById('main-content').classList.remove('hidden');
+            document.getElementById('detail-view').classList.add('hidden');
+        });
 
-    // Distribution dialog functionality
-    const dialog = document.getElementById('distribution-dialog');
-    const showButton = document.getElementById('show-distribution');
-    const closeButton = dialog.querySelector('.close-dialog');
+        // Distribution dialog functionality
+        const dialog = document.getElementById('distribution-dialog');
+        const showButton = document.getElementById('show-distribution');
+        const closeButton = dialog.querySelector('.close-dialog');
 
-    showButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        dialog.showModal();
-    });
+        showButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            dialog.showModal();
+        });
 
-    closeButton.addEventListener('click', () => {
-        dialog.close();
-    });
-
-    dialog.addEventListener('click', (e) => {
-        if (e.target === dialog) {
+        closeButton.addEventListener('click', () => {
             dialog.close();
-        }
+        });
+
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog) {
+                dialog.close();
+            }
+        });
+        
+        // Inicializar con 3º ESO
+        updateContent(currentGrade);
     });
-    
-    // Inicializar con 3º ESO
-    updateContent(currentGrade);
 }
 
 // Initialize the app when DOM is loaded

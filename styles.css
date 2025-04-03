@@ -35,18 +35,21 @@ h1 {
 }
 
 .subject-card {
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    cursor: pointer;
-    transition: transform 0.2s;
     position: relative;
-    z-index: 1;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-.subject-card:hover {
+.subject-card.has-details {
+    cursor: pointer;
+}
+
+.subject-card.has-details:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .subject-header {
@@ -334,6 +337,21 @@ dialog::backdrop {
 
 .menu-toggle:hover {
     color: var(--primary-color);
+}
+
+.info-icon {
+    color: #4a90e2;
+    margin-left: 0.5rem;
+    font-size: 0.9em;
+}
+
+.detail-section {
+    margin-bottom: 1.5rem;
+}
+
+.detail-section h3 {
+    color: #4a90e2;
+    margin-bottom: 0.5rem;
 }
 
 @media (max-width: 512px) {
