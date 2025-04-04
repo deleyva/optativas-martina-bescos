@@ -233,9 +233,9 @@ async function showSubjectDetail(subject, hours, category) {
     // Obtener los detalles del CSV
     const subjectData = dfSubjects.query(dfSubjects['Identificador'].eq(hours.id));
     const details = {
-        queEs: subjectData['¿Qué es?'].values[0],
-        paraQue: subjectData['¿Para qué sirve?'].values[0],
-        quienRecomendamos: subjectData['¿A quién la recomendamos?'].values[0]
+        queEs: subjectData['que-es'].values[0],
+        paraQue: subjectData['para-que-sirve'].values[0],
+        quienRecomendamos: subjectData['a-quien'].values[0]
     };
     
     detailContent.innerHTML = `
